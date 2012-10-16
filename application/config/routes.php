@@ -38,9 +38,16 @@
 |
 */
 
-$route['default_controller'] = "map";
+$route['default_controller'] = "app";
 $route['404_override'] = '';
 
+$route['app'] = 'app';
+$route['app/([a-zA-Z_-]+)/(:any)'] = '$1/app/$2';
+$route['app/login'] = 'app/login';
+$route['app/reset'] = 'app/reset';
+$route['app/forgot_password'] = 'app/forgot_password';
+$route['app/logout'] = 'app/logout';
+$route['app/([a-zA-Z_-]+)'] = '$1/app/index';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

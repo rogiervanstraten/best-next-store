@@ -18,6 +18,39 @@
 
 <body><!--[if lt IE 7]><p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p><![endif]-->
 	
+<div id="toolbar">
+	<a class="logo" href="/">Smarten UP</a>
+	
+	<div class="ui-nav">
+		
+		<ul class="nav">
+			<li>
+				<a class="stats" href="/">
+					Statistics
+				</a>
+			</li>
+			<li>
+				<a class="settings" href="/">
+					Settings
+				</a>
+			</li>
+		</ul>
+	
+	</div>
+	
+	<div class="ui-control">
+		<div>
+			<br /><br /><br />
+			<h1 id="upload_your_data.">Upload your data.</h1>
+			<br />
+			<h5>After upload, the analysing process will begin.</h5>
+			<br />
+			<input type="file" name="some_name" value="" id="some_name">
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+
 <div id="canvas"></div>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
@@ -26,26 +59,24 @@
   <script src="<?php echo base_url(); ?>assets/js/plugins.js"></script>
   <script src="<?php echo base_url(); ?>assets/js/main.js"></script>
 	<script type="text/javascript" charset="utf-8">
-		
-		
 		var map;
-		
 		
 		function loadPlacemarks()
 		{
 			$.getJSON('http://localhost/nextstore/index.php/map/fetch_placemarks', function(json) {
 				
 				if (json.length > 0) {
-					
+						
 					for (_i=0; _i < json.length; _i++) {
 												 
 						var path = new google.maps.LatLng(json[_i].lat,json[_i].lng);
+						
 						var title = json[_i].title;
-				
+						
 						addPlacemark(path, title);
-					
+						
 					}
-				
+										
 				}
 				
 			});
@@ -64,6 +95,7 @@
 						var correlation = json[_i].correlation;
 						var title = json[_i].title;
 						var zip = json[_i].coordinates;
+						var vl = json[_i].vl;
 								
 						var path = [];
 				
@@ -75,7 +107,7 @@
 					
 						}
 						
-						addPolygon(path, correlation, title);
+						addPolygon(path, correlation, vl,title);
 											
 					}
 					
@@ -85,71 +117,48 @@
 			
 		}
 
+		
 		function initialize() {
 
 		  var mapOptions = {
 		    zoom: 8,
 		    center: new google.maps.LatLng(51.8391075134278, 4.603306770324821),
-		    mapTypeId: google.maps.MapTypeId.ROADMAP
-		  };
+				mapTypeId: google.maps.MapTypeId.ROADMAP,
+				mapTypeControl: false,
+				mapTypeControlOptions: {
+					style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+					position: google.maps.ControlPosition.TOP_RIGHT
+					},
+				panControl: false,
+				streetViewControl: false,
+				scaleControl: false,
+				zoomControl: true,
+				zoomControlOptions: {
+					style: google.maps.ZoomControlStyle.LARGE,
+					position: google.maps.ControlPosition.RIGHT_TOP
+					}
+				};
 
 		  map = new google.maps.Map(document.getElementById('canvas'), mapOptions);
 			
 			loadScript();
-			
 			loadPlacemarks();
-		}
-
-
-		function addPolygon(path, correlation, title)
-		{
-			var fillOp = (Math.floor(Math.random() * 70) + 20)/100;
-			var fill = '#'+Math.floor(Math.random()*16777215).toString(16);
-			zipcode = new google.maps.Polygon({
-		    paths: path,
-		    strokeColor: "#ffffff",
-		    strokeOpacity: 0.8,
-		    strokeWeight: 1,
-		    fillColor: fill,
-		    fillOpacity: fillOp
-		  });
-			
-			zipcode.infowindow = new google.maps.InfoWindow({content:"<b>" + title + "</b>" + "</br>"});
-			
-			zipcode.infowindow.name = title;
-			
-			google.maps.event.addListener(zipcode, 'click', showInfo);
-			
-			zipcode.setMap(map);
 			
 		}
 		
-		function addPlacemark(coordinates, title)
-		{
-			
-			var marker = new google.maps.Marker({
-		      position: coordinates,
-		      map: map,
-		      title: title
-		  });
-		
-		}
-		
-		var opened_info = new google.maps.InfoWindow();
-    
-		function showInfo(event) {
-        opened_info.close();
-        if (opened_info.name != this.infowindow.name) {
-            this.infowindow.setPosition(event.latLng);
-            this.infowindow.open(map);
-            opened_info = this.infowindow;
-        }
-    }
-
 		$(document).ready(function(){
 
 			initialize();
-
+			
+			$('.settings').click(function(){
+				event.preventDefault();
+				
+				$('.ui-control').animate({width: '400px'},200,function(){
+					$('.ui-control').children().fadeIn();
+				});
+				
+			});
+			
 		});
 		
 	</script>

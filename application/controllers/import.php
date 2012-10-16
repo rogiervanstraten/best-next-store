@@ -9,14 +9,14 @@ class Import extends CI_Controller {
 		
 	}
 
-	public function kml($filename=NULL)
+	public function kml($filename=NULL, $zoom=0)
 	{
 		$url = FCPATH.'uploads/import/'.$filename;
 		
 		if($filename!=NULL && file_exists($url))
 		{
 			
-			$this->db->truncate('boundaries');
+			//$this->db->truncate('boundaries');
 			
 			$xml = new SimpleXMLElement($url, null, true);
 			
@@ -50,6 +50,7 @@ class Import extends CI_Controller {
 
 						$data = array(
 							'zip' => (string)$name,
+							'zoom' => $zoom,
 							'lat' => (float)$lat,
 							'lng' => (float)$lng,
 							'alt' => '0',
@@ -85,7 +86,7 @@ class Import extends CI_Controller {
 											
 						$data['polygon'] = $coordinates;
 												
-						$this->db->insert('boundaries', $data);
+						$this->db->insert('geo_boundaries', $data);
 						
 					}
 
