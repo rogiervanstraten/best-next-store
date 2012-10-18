@@ -5,13 +5,16 @@ class App extends Admin_Controller
 
 	public function __construct()
 	{
-
   		parent::__construct();
-					
+			$this->template->set_theme('app');
 			$this->load->library('form_validation');
-		
+			$this->form_validation->set_error_delimiters($this->config->item('error_start_delimiter', 'ion_auth'), $this->config->item('error_end_delimiter', 'ion_auth'));
  	}
 
+	/******
+	*	Index
+	*	Check if logged in
+	******/
  	public function index()
 	{
 		
@@ -21,21 +24,19 @@ class App extends Admin_Controller
 		}
 		elseif (!$this->ion_auth->is_admin())
 		{
-			redirect('app/geo', 'refresh');
+			redirect('app/geo/coverage', 'refresh');
 		}
 		else
 		{
-
-			redirect('app/geo', 'refresh');
-
+			redirect('app/dashboard', 'refresh');
 		}
 		
 	}
 	
-	
-	/**
-	*** User Log Out
-	**/
+	/******
+	*	Log User out redirect to Login
+	*	Logout
+	******/
 	public function logout()
 	{
 		$this->data['title'] = "Logout";
@@ -50,6 +51,8 @@ class App extends Admin_Controller
 	******/
 	public function forgot_password()
 	{
+		$this->data['title'] = 'Forgot Password';
+		
 		$this->form_validation->set_rules('email', 'Email Address', 'required');
 		if ($this->form_validation->run() == false)
 		{
@@ -60,7 +63,12 @@ class App extends Admin_Controller
 
 			//set any errors and display the form
 			$this->data['message'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('message');
-			$this->load->view('auth/forgot_password', $this->data);
+			
+			$this->template
+				->title('Best Next Store', $this->data['title'])
+				->set_layout('frontend')
+				->build('public/forgot_password', $this->data);
+			
 		}
 		else
 		{
@@ -99,7 +107,7 @@ class App extends Admin_Controller
 		}
 		elseif($this->ion_auth->logged_in() && $this->ion_auth->is_admin())
 		{
-			redirect('app/geo', 'refresh');
+			redirect('app/dashboard', 'refresh');
 		}
 
 		if ($this->form_validation->run() == true)
@@ -109,7 +117,7 @@ class App extends Admin_Controller
 			if ($this->ion_auth->login($this->input->post('identity'), $this->input->post('password'), $remember))
 			{ 
 				$this->session->set_flashdata('message', $this->ion_auth->messages());
-				redirect('app/geo', 'refresh');
+				redirect('/', 'refresh');
 			}
 			else
 			{ 

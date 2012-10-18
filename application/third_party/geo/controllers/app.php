@@ -18,20 +18,24 @@ class App extends Admin_Controller {
 
 	public function index()
 	{	
-		$this->load->view('geo/app');
+		
+		$this->template->set_layout('default')->build('geo/app');
+		
+		//$this->load->view('geo/app');
 	}
 	
 	
 	public function coverage()
 	{
-		$this->load->view('geo/app-cover');
 		
+		$this->template->set_layout('default')->build('geo/app-cover');
+				
 	}
 	
 	public function performance()
 	{
-		$this->load->view('geo/app-perform');
-		
+		$this->template->set_layout('default')->build('geo/app-perform');
+			
 	}
 	
 	

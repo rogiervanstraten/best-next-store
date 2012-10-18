@@ -18,14 +18,50 @@
 <style type="text/css" media="screen">#canvas img {max-width: none;}</style>
 <body><!--[if lt IE 7]><p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p><![endif]-->
 	
+	
+	<div id="toolbar">
+
+		<div class="ui-nav">
+			<a class="client-logo" href="/">Bever Sport</a>
+
+			<ul class="nav">
+				<li>
+					<span class="group"><i class="icon-signal icon-white"></i> Store Portfolio</span>
+					<ul>
+						<li><a href="<?= site_url() ?>/app/geo/coverage">Coverage</a></li>
+						<li><a href="<?= site_url() ?>/app/geo/performance">Performance</a></li>
+						<!--<li><a href="<?= site_url() ?>/app">New Store Potential</a></li>-->
+					</ul>
+				</li>
+				<li>
+					<span class="group"><i class="icon-map-marker icon-white"></i> Areas</span>
+					<ul>
+						<li><a href="<?= site_url() ?>/app/geo">Underperforming Areas</a></li>
+						<li><a href="<?= site_url() ?>/app/geo">Drivetime Analytics</a></li>
+					</ul>
+				</li>
+				<li>
+					<span class="group"><i class="icon-cog icon-white"></i> Settings</span>
+					<ul>
+						<li><a href="<?= site_url() ?>/app">Define Target Group</a></li>
+						<li><a href="<?= site_url() ?>/app">Define Catchment Area</a></li>
+						<li><a href="<?= site_url() ?>/app">Upload Data</a></li>
+					</ul>
+				</li>
+				<li>
+					<span class="group"><i class="icon-user icon-white"></i> Application</span>
+					<ul>
+						<li><a href="<?= site_url() ?>/app/profile">Profile</a></li>
+						<li><a href="<?= site_url() ?>/app/logout">Logout</a></li>
+					</ul>
+				</li>
+			</ul>
+
+			<a class="logo" href="/">Smarten UP</a>
+
+		</div>
+	</div>
+	
 	<?php echo $template['body']; ?>
 
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
-  <script>window.jQuery || document.write('<script src="<?php echo base_url(); ?>assets/js/vendor/jquery-1.8.0.min.js"><\/script>')</script>
-
-  <script src="<?php echo base_url(); ?>assets/js/plugins.js"></script>
-
-  <script src="<?php echo base_url(); ?>assets/bootstrap/js/bootstrap.js"></script>
-
-  <script src="<?php echo base_url(); ?>assets/js/app.js"></script>
 </body></html>

@@ -30,7 +30,7 @@ blockquote cite a,blockquote cite a:visited,blockquote cite a:visited {color:#55
 /*BREAKS*/
 hr{ border: solid #ddd; border-width: 1px 0 0; clear: both; margin: 10px 0 30px; height: 0; }
 /*LINKS*/
-a, a:visited { color: #333; text-decoration: underline; outline: 0; }
+a, a:visited { color: #333; text-decoration: none; outline: 0; }
 a:hover, a:focus { color: #000; }
 p a,p a:visited { line-height:inherit;}
 
@@ -49,7 +49,7 @@ html, body {
 	
 a.client-logo, a.logo {
 	display:block;
-	opacity:0.2;
+	opacity:0.8;
 	text-indent:-9999px;
 	transition: opacity 0.2s;
 	-moz-transition: opacity 0.2s;
@@ -84,6 +84,8 @@ a.client-logo:hover, a.logo:hover {opacity:1;}
 	left:0;
 	top:0;
 	height:100%;
+	-webkit-box-shadow:0 0 5px rgba(0,0,0,0.4);
+	-moz-box-shadow:0 0 5px rgba(0,0,0,0.4);
 	box-shadow:0 0 5px rgba(0,0,0,0.4);
 	overflow:hidden;
 }
@@ -150,6 +152,8 @@ ul.nav span.group {
 	left:230px;
 	top:0;
 	height:100%;
+	-webkit-box-shadow:0 0 7px rgba(0,0,0,0.6);
+	-moz-box-shadow:0 0 7px rgba(0,0,0,0.6);
 	box-shadow:0 0 7px rgba(0,0,0,0.6);
 }
 
@@ -158,6 +162,9 @@ ul.nav span.group {
 	min-width:480px;
 	background:#fefefe repeat;	
 }
+
+#content.large .ui-control {width:500px}
+
 
 .main {
 	padding:35px;
@@ -171,6 +178,10 @@ ul.nav span.group {
 	z-index:0;
 	width:600px;
 	height:100%;
+	-webkit-box-shadow:0 0 7px rgba(0,0,0,0.6);
+	-moz-box-shadow:0 0 7px rgba(0,0,0,0.6);
+	box-shadow:0 0 7px rgba(0,0,0,0.6);
+
 }
 
 .dropdown-menu a {

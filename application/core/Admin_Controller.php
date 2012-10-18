@@ -13,19 +13,18 @@ class Admin_Controller extends MY_Controller
 			redirect('app/login');
 		}
 		
-		$this->template->set_theme('app');
+		$https = FALSE;
 		
-		//$https = FALSE;
-		/*
 		if ($https and strtolower(substr(current_url(), 4, 1)) != 's')
 		{
 			redirect(str_replace('http:', 'https:', current_url()).'?session='.session_id());
-		}*/
+		}
 					
 	}
 
 	private function _check_access()
 	{
+		$this->permission = array('app/geo');
 		
 		$allowed = array('app/login','app/logout','app/forgot_password');
 		
@@ -39,8 +38,15 @@ class Admin_Controller extends MY_Controller
 		{
 			redirect('app/login');
 		}
+		else if ($this->ion_auth->logged_in() && $this->ion_auth->is_admin())
+		{
+			$this->template->set_theme('app');
+			return TRUE;
+		}
 		else if ($this->ion_auth->logged_in())
 		{
+			//CHECK PERMISSIONS!
+			$this->template->set_theme('app');
 			return TRUE;
 		}
 

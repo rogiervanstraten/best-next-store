@@ -1,119 +1,28 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Auth extends CI_Controller {
+class App extends Admin_Controller {
 
 	function __construct()
 	{
 		parent::__construct();
-		$this->load->library('ion_auth');
-		$this->load->library('session');
 		$this->load->library('form_validation');
-		$this->load->helper('url');
-		
-		// Load MongoDB library instead of native db driver if required
-		$this->config->item('use_mongodb', 'ion_auth') ?
-		$this->load->library('mongo_db') :
-
-		$this->load->database();
-
-		$this->form_validation->set_error_delimiters($this->config->item('error_start_delimiter', 'ion_auth'), $this->config->item('error_end_delimiter', 'ion_auth'));
+		$this->template->set_theme('app')->set_layout('admin');
 	}
 
-	//redirect if needed, otherwise display the user list
 	function index()
 	{
+		
+		$this->data['message'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('message');
 
-		if (!$this->ion_auth->logged_in())
+		//list the users
+		$this->data['users'] = $this->ion_auth->users()->result();
+		foreach ($this->data['users'] as $k => $user)
 		{
-			//redirect them to the login page
-			redirect('users/auth/login', 'refresh');
-		}
-		elseif (!$this->ion_auth->is_admin())
-		{
-			//redirect them to the home page because they must be an administrator to view this
-			redirect('/', 'refresh');
-		}
-		else
-		{
-			//set the flash data error message if there is one
-			$this->data['message'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('message');
-
-			//list the users
-			$this->data['users'] = $this->ion_auth->users()->result();
-			foreach ($this->data['users'] as $k => $user)
-			{
-				$this->data['users'][$k]->groups = $this->ion_auth->get_users_groups($user->id)->result();
-			}
-
-
-			$this->load->view('auth/index', $this->data);
+			$this->data['users'][$k]->groups = $this->ion_auth->get_users_groups($user->id)->result();
 		}
 		
-	}
+		$this->template->build('users/app/index', $this->data);
 
-	//log the user in
-	function login()
-	{
-		$this->data['title'] = "Login";
-
-		//validate form input
-		$this->form_validation->set_rules('identity', 'Identity', 'required');
-		$this->form_validation->set_rules('password', 'Password', 'required');
-
-		if ($this->form_validation->run() == true)
-		{ 
-			//check to see if the user is logging in
-			//check for "remember me"
-			$remember = (bool) $this->input->post('remember');
-
-			if ($this->ion_auth->login($this->input->post('identity'), $this->input->post('password'), $remember))
-			{ 
-				//if the login is successful
-				//redirect them back to the home page
-				$this->session->set_flashdata('message', $this->ion_auth->messages());
-				redirect('/', 'refresh');
-			}
-			else
-			{ 
-				//if the login was un-successful
-				//redirect them back to the login page
-				$this->session->set_flashdata('message', $this->ion_auth->errors());
-				redirect('users/auth/login', 'refresh'); //use redirects instead of loading views for compatibility with MY_Controller libraries
-			}
-		}
-		else
-		{  
-			//the user is not logging in so display the login page
-			//set the flash data error message if there is one
-			$this->data['message'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('message');
-
-			$this->data['identity'] = array('name' => 'identity',
-				'id' => 'identity',
-				'type' => 'text',
-				'value' => $this->form_validation->set_value('identity'),
-			);
-			$this->data['password'] = array('name' => 'password',
-				'id' => 'password',
-				'type' => 'password',
-			);
-
-			$this->load->view('auth/login', $this->data);
-		}
-	}
-
-	//log the user out
-	function logout()
-	{
-		$this->data['title'] = "Logout";
-
-		//log the user out
-		$logout = $this->ion_auth->logout();
-
-		//redirect them to the login page
-		$this->session->set_flashdata('message', $this->ion_auth->messages());
-		
-		redirect('users/auth/login', 'refresh');
-		
 	}
 
 	//change password
@@ -180,40 +89,6 @@ class Auth extends CI_Controller {
 			{
 				$this->session->set_flashdata('message', $this->ion_auth->errors());
 				redirect('users/auth/change_password', 'refresh');
-			}
-		}
-	}
-
-	//forgot password
-	function forgot_password()
-	{
-		$this->form_validation->set_rules('email', 'Email Address', 'required');
-		if ($this->form_validation->run() == false)
-		{
-			//setup the input
-			$this->data['email'] = array('name' => 'email',
-				'id' => 'email',
-			);
-
-			//set any errors and display the form
-			$this->data['message'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('message');
-			$this->load->view('auth/forgot_password', $this->data);
-		}
-		else
-		{
-			//run the forgotten password method to email an activation code to the user
-			$forgotten = $this->ion_auth->forgotten_password($this->input->post('email'));
-
-			if ($forgotten)
-			{ 
-				//if there were no errors
-				$this->session->set_flashdata('message', $this->ion_auth->messages());
-				redirect("auth/login", 'refresh'); //we should display a confirmation page here instead of the login page
-			}
-			else
-			{
-				$this->session->set_flashdata('message', $this->ion_auth->errors());
-				redirect("auth/forgot_password", 'refresh');
 			}
 		}
 	}
@@ -379,19 +254,13 @@ class Auth extends CI_Controller {
 	function create_user()
 	{
 		$this->data['title'] = "Create User";
-
-		if (!$this->ion_auth->logged_in() || !$this->ion_auth->is_admin())
-		{
-			redirect('auth', 'refresh');
-		}
-
+		
 		//validate form input
 		$this->form_validation->set_rules('first_name', 'First Name', 'required|xss_clean');
 		$this->form_validation->set_rules('last_name', 'Last Name', 'required|xss_clean');
 		$this->form_validation->set_rules('email', 'Email Address', 'required|valid_email');
-		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'required|xss_clean|min_length[3]|max_length[3]');
-		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'required|xss_clean|min_length[3]|max_length[3]');
-		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'required|xss_clean|min_length[4]|max_length[4]');
+		$this->form_validation->set_rules('phone1', 'Phone', 'required|xss_clean|min_length[3]|max_length[15]');
+		
 		$this->form_validation->set_rules('company', 'Company Name', 'required|xss_clean');
 		$this->form_validation->set_rules('password', 'Password', 'required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 		$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'required');
@@ -406,7 +275,7 @@ class Auth extends CI_Controller {
 				'first_name' => $this->input->post('first_name'),
 				'last_name'  => $this->input->post('last_name'),
 				'company'    => $this->input->post('company'),
-				'phone'      => $this->input->post('phone1') . '-' . $this->input->post('phone2') . '-' . $this->input->post('phone3'),
+				'phone'      => $this->input->post('phone1')
 			);
 		}
 		if ($this->form_validation->run() == true && $this->ion_auth->register($username, $password, $email, $additional_data))
@@ -414,7 +283,7 @@ class Auth extends CI_Controller {
 			//check to see if we are creating the user
 			//redirect them back to the admin page
 			$this->session->set_flashdata('message', $this->ion_auth->messages());
-			redirect("auth", 'refresh');
+			redirect("app/users", 'refresh');
 		}
 		else
 		{ 
@@ -452,18 +321,6 @@ class Auth extends CI_Controller {
 				'type'  => 'text',
 				'value' => $this->form_validation->set_value('phone1'),
 			);
-			$this->data['phone2'] = array(
-				'name'  => 'phone2',
-				'id'    => 'phone2',
-				'type'  => 'text',
-				'value' => $this->form_validation->set_value('phone2'),
-			);
-			$this->data['phone3'] = array(
-				'name'  => 'phone3',
-				'id'    => 'phone3',
-				'type'  => 'text',
-				'value' => $this->form_validation->set_value('phone3'),
-			);
 			$this->data['password'] = array(
 				'name'  => 'password',
 				'id'    => 'password',
@@ -476,8 +333,9 @@ class Auth extends CI_Controller {
 				'type'  => 'password',
 				'value' => $this->form_validation->set_value('password_confirm'),
 			);
+			
+			$this->template->title('Best Next Store', $this->data['title'])->build('users/app/create_user', $this->data);
 
-			$this->load->view('auth/create_user', $this->data);
 		}
 	}
 
@@ -502,9 +360,7 @@ class Auth extends CI_Controller {
 		//validate form input
 		$this->form_validation->set_rules('first_name', 'First Name', 'required|xss_clean');
 		$this->form_validation->set_rules('last_name', 'Last Name', 'required|xss_clean');
-		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'required|xss_clean|min_length[3]|max_length[3]');
-		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'required|xss_clean|min_length[3]|max_length[3]');
-		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'required|xss_clean|min_length[4]|max_length[4]');
+		$this->form_validation->set_rules('phone1', 'Phone', 'required|xss_clean|min_length[3]|max_length[15]');
 		$this->form_validation->set_rules('company', 'Company Name', 'required|xss_clean');
 
 		if (isset($_POST) && !empty($_POST))
@@ -575,18 +431,7 @@ class Auth extends CI_Controller {
 			'type'  => 'text',
 			'value' => $this->form_validation->set_value('phone1', $user->phone[0]),
 		);
-		$this->data['phone2'] = array(
-			'name'  => 'phone2',
-			'id'    => 'phone2',
-			'type'  => 'text',
-			'value' => $this->form_validation->set_value('phone2', $user->phone[1]),
-		);
-		$this->data['phone3'] = array(
-			'name'  => 'phone3',
-			'id'    => 'phone3',
-			'type'  => 'text',
-			'value' => $this->form_validation->set_value('phone3', $user->phone[2]),
-		);
+
 		$this->data['password'] = array(
 			'name' => 'password',
 			'id'   => 'password',

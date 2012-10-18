@@ -1,10 +1,3 @@
-<div class="ui-login-nav">
-	<ul class="ui-nav">
-		<li><a href="#">About</a></li>
-		<li><a href="#">Sign up</a></li>
-		
-	</ul>
-</div>
 <div class="container">
 	<div class="columns offset-by-five six row">
 		<div class="login">
@@ -38,5 +31,10 @@
 			      <?php echo form_submit('submit', 'Login', 'class="btn"');?>
 			    </div>
 			  </div>
+				<!--
+				<div class="progress progress-striped active">
+				  <div class="bar"></div>
+				</div>
+				-->
 		<?php echo form_close();?>
 </div></div></div>
